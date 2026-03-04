@@ -6,7 +6,6 @@
   <title>Personal Video Message</title>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       background: #0a0a0a;
       overflow: hidden;
@@ -15,237 +14,133 @@
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     }
 
-    /* ── BACKGROUND IFRAME ── */
-    #site-container {
-      position: fixed;
-      inset: 0;
-      z-index: 0;
-      overflow: hidden;
-    }
+    #site-container { position: fixed; inset: 0; z-index: 0; overflow: hidden; }
 
     #site-iframe {
-      width: 100%;
-      height: calc(100vh + 1400px);
-      border: none;
-      display: block;
+      width: 100%; height: calc(100vh + 1400px);
+      border: none; display: block;
       transform: translateY(0px);
-      will-change: transform;
-      pointer-events: none;
+      will-change: transform; pointer-events: none;
     }
 
-    #site-overlay {
-      position: absolute;
-      inset: 0;
-      background: rgba(0,0,0,0.15);
-      pointer-events: none;
+    #screenshot-bg { display: none; position: fixed; inset: 0; z-index: 0; overflow: hidden; }
+    #screenshot-img {
+      width: 100%; height: calc(100vh + 1400px);
+      object-fit: cover; object-position: top center;
+      transform: translateY(0px); will-change: transform; display: block;
     }
 
-    /* ── TOP BAR ── */
+    .overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.12); pointer-events: none; }
+
     #top-bar {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 20;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 20;
       padding: 16px 22px;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, transparent 100%);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.85) 0%, transparent 100%);
+      display: flex; align-items: center; gap: 10px;
       animation: fadeInDown 0.6s ease forwards;
     }
 
     #rec-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: #ff4444;
-      flex-shrink: 0;
+      width: 10px; height: 10px; border-radius: 50%;
+      background: #ff4444; flex-shrink: 0;
       box-shadow: 0 0 8px #ff4444;
       animation: recPulse 1.2s ease-in-out infinite;
     }
 
     #greeting {
-      color: white;
-      font-size: 15px;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      text-shadow: 0 1px 6px rgba(0,0,0,0.6);
-      flex: 1;
+      color: white; font-size: 15px; font-weight: 600;
+      letter-spacing: -0.02em; text-shadow: 0 1px 6px rgba(0,0,0,0.6); flex: 1;
     }
-
-    #greeting .name { color: #60d4ff; }
-    #greeting .company { color: #a8ff78; }
-    #greeting .sub { color: rgba(255,255,255,0.65); font-weight: 400; }
+    .name { color: #60d4ff; }
+    .company { color: #a8ff78; }
+    .sub { color: rgba(255,255,255,0.65); font-weight: 400; }
 
     #site-badge {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 20px;
-      padding: 5px 13px;
-      color: rgba(255,255,255,0.8);
-      font-size: 12px;
-      backdrop-filter: blur(10px);
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      white-space: nowrap;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px; padding: 5px 13px; color: rgba(255,255,255,0.8);
+      font-size: 12px; backdrop-filter: blur(10px);
+      display: flex; align-items: center; gap: 6px; white-space: nowrap;
     }
-
     #site-badge .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: #4ade80;
-      display: inline-block;
-      animation: greenPulse 2s ease-in-out infinite;
+      width: 6px; height: 6px; border-radius: 50%; background: #4ade80;
+      display: inline-block; animation: greenPulse 2s ease-in-out infinite;
     }
 
-    /* ── VIDEO BUBBLE ── */
     #video-wrap {
-      position: fixed;
-      bottom: 24px;
-      left: 24px;
-      z-index: 30;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
-      gap: 10px;
+      position: fixed; bottom: 24px; left: 24px; z-index: 30;
+      display: flex; flex-direction: column; align-items: flex-start; gap: 10px;
       animation: slideUpIn 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.3s both;
     }
 
     #video-bubble {
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      overflow: hidden;
+      width: 200px; height: 200px; border-radius: 50%; overflow: hidden;
       border: 3px solid rgba(255,255,255,0.92);
-      box-shadow:
-        0 8px 40px rgba(0,0,0,0.6),
-        0 0 0 1px rgba(255,255,255,0.08),
-        0 0 60px rgba(96,212,255,0.15);
+      box-shadow: 0 8px 40px rgba(0,0,0,0.6), 0 0 60px rgba(96,212,255,0.15);
       background: #111;
-      position: relative;
     }
-
-    #video-bubble iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-    }
+    #video-bubble iframe { width: 100%; height: 100%; border: none; display: block; }
 
     #name-tag {
-      background: rgba(0,0,0,0.72);
-      backdrop-filter: blur(14px);
-      border: 1px solid rgba(255,255,255,0.12);
-      border-radius: 12px;
-      padding: 7px 16px;
-      color: white;
-      font-size: 13px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
+      background: rgba(0,0,0,0.72); backdrop-filter: blur(14px);
+      border: 1px solid rgba(255,255,255,0.12); border-radius: 12px;
+      padding: 7px 16px; color: white; font-size: 13px; font-weight: 500;
       margin-left: 14px;
     }
-
     #name-tag strong { color: #60d4ff; }
 
-    /* ── SCROLL INDICATOR ── */
     #scroll-indicator {
-      position: fixed;
-      bottom: 28px;
-      right: 24px;
-      z-index: 20;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      background: rgba(0,0,0,0.65);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px;
-      padding: 7px 16px;
-      color: rgba(255,255,255,0.75);
-      font-size: 12px;
-      transition: opacity 0.5s ease;
-      animation: fadeInUp 0.5s ease 1s both;
+      position: fixed; bottom: 28px; right: 24px; z-index: 20;
+      display: flex; align-items: center; gap: 8px;
+      background: rgba(0,0,0,0.65); backdrop-filter: blur(10px);
+      border: 1px solid rgba(255,255,255,0.1); border-radius: 20px;
+      padding: 7px 16px; color: rgba(255,255,255,0.75); font-size: 12px;
+      transition: opacity 0.5s ease; animation: fadeInUp 0.5s ease 1s both;
     }
-
-    #scroll-indicator .arrow {
-      animation: bounce 1s ease-in-out infinite;
-      display: inline-block;
-    }
-
+    #scroll-indicator .arrow { animation: bounce 1s ease-in-out infinite; display: inline-block; }
     #scroll-indicator.hidden { opacity: 0; pointer-events: none; }
 
-    /* ── IFRAME BLOCKED FALLBACK ── */
-    #blocked-fallback {
-      display: none;
-      position: fixed;
-      inset: 0;
-      z-index: 1;
-      background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%);
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-      gap: 16px;
-      color: white;
-      text-align: center;
+    #loading-bg {
+      position: fixed; inset: 0; z-index: 5;
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 40%, #0f172a 100%);
+      display: flex; align-items: center; justify-content: center;
+      flex-direction: column; gap: 14px; transition: opacity 0.6s ease;
     }
+    #loading-bg.hidden { opacity: 0; pointer-events: none; }
+    .spinner {
+      width: 36px; height: 36px;
+      border: 3px solid rgba(255,255,255,0.1); border-top-color: #60d4ff;
+      border-radius: 50%; animation: spin 0.8s linear infinite;
+    }
+    .loading-text { color: rgba(255,255,255,0.5); font-size: 13px; }
+    .loading-url { color: #60d4ff; font-size: 12px; max-width: 300px; text-align: center; word-break: break-all; }
 
-    #blocked-fallback.show { display: flex; }
-    #blocked-fallback h2 { font-size: 20px; font-weight: 600; }
-    #blocked-fallback p { color: rgba(255,255,255,0.5); font-size: 14px; }
-    #blocked-fallback .site-url {
-      color: #60d4ff;
-      font-size: 13px;
-      background: rgba(96,212,255,0.1);
-      padding: 8px 16px;
-      border-radius: 8px;
-      border: 1px solid rgba(96,212,255,0.2);
-      max-width: 400px;
-      word-break: break-all;
-    }
-
-    /* ── ANIMATIONS ── */
-    @keyframes recPulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
-    }
-    @keyframes greenPulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.5; }
-    }
-    @keyframes bounce {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(4px); }
-    }
-    @keyframes fadeInDown {
-      from { opacity: 0; transform: translateY(-12px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(8px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    @keyframes slideUpIn {
-      from { opacity: 0; transform: translateY(40px) scale(0.85); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    @keyframes recPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.4;transform:scale(0.8)} }
+    @keyframes greenPulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(4px)} }
+    @keyframes fadeInDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes fadeInUp { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+    @keyframes slideUpIn { from{opacity:0;transform:translateY(40px) scale(0.85)} to{opacity:1;transform:translateY(0) scale(1)} }
+    @keyframes spin { to{transform:rotate(360deg)} }
   </style>
 </head>
 <body>
 
-  <!-- Background: Lead's site -->
-  <div id="site-container">
-    <iframe id="site-iframe" src="" sandbox="allow-scripts allow-same-origin allow-forms" title="Lead website"></iframe>
-    <div id="site-overlay"></div>
-    <!-- Fallback if iframe is blocked -->
-    <div id="blocked-fallback">
-      <div style="font-size:40px">🌐</div>
-      <h2>Website Preview</h2>
-      <p>Recorded this message specifically for your team at</p>
-      <div class="site-url" id="fallback-url"></div>
-    </div>
+  <div id="loading-bg">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading preview...</div>
+    <div class="loading-url" id="loading-url"></div>
   </div>
 
-  <!-- Top bar greeting -->
+  <div id="site-container">
+    <iframe id="site-iframe" src="" sandbox="allow-scripts allow-same-origin allow-forms" title="Lead website"></iframe>
+    <div class="overlay"></div>
+  </div>
+
+  <div id="screenshot-bg">
+    <img id="screenshot-img" src="" alt="Website preview" />
+    <div class="overlay"></div>
+  </div>
+
   <div id="top-bar">
     <div id="rec-dot"></div>
     <div id="greeting">
@@ -258,20 +153,16 @@
     </div>
   </div>
 
-  <!-- Video bubble bottom-left -->
   <div id="video-wrap">
     <div id="video-bubble">
       <iframe
-        id="video-iframe"
         src="https://drive.google.com/file/d/1UQkAzQQGgXmdmbVug6YffYHABV3gTlgc/preview"
-        allow="autoplay"
-        allowfullscreen
+        allow="autoplay" allowfullscreen
       ></iframe>
     </div>
     <div id="name-tag">🎥 Personal message for <strong id="name-tag-name">you</strong></div>
   </div>
 
-  <!-- Scroll indicator -->
   <div id="scroll-indicator">
     <span class="arrow">↓</span>
     <span id="scroll-label">Browsing...</span>
@@ -279,78 +170,109 @@
 
   <script>
     (function() {
-      // ── Parse URL params ──
-      const params = new URLSearchParams(window.location.search);
-      const to   = params.get('to')   || 'there';
-      const co   = params.get('co')   || '';
-      const site = params.get('site') || 'https://www.upwork.com';
+      var params = new URLSearchParams(window.location.search);
+      var to   = params.get('to')   || 'there';
+      var co   = params.get('co')   || '';
+      var site = params.get('site') || 'https://www.upwork.com';
 
-      // ── Set personalization ──
       document.getElementById('name-display').textContent = to;
       document.getElementById('name-tag-name').textContent = to;
-
       if (co) {
         document.getElementById('company-display').innerHTML =
-          ` &mdash; recorded this for <span class="company">${co}</span>`;
+          ' &mdash; recorded this for <span class="company">' + co + '</span>';
       }
-
-      const siteLabel = site.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
+      var siteLabel = site.replace(/https?:\/\/(www\.)?/, '').split('/')[0];
       document.getElementById('site-label').textContent = siteLabel;
       document.getElementById('scroll-label').textContent = 'Browsing ' + siteLabel;
-      document.getElementById('fallback-url').textContent = site;
+      document.getElementById('loading-url').textContent = siteLabel;
+      document.title = co ? 'Message for ' + to + ' @ ' + co : 'Personal message for ' + to;
 
-      // ── Load iframe ──
-      const iframe = document.getElementById('site-iframe');
-      iframe.src = site;
-
-      // Detect if iframe was blocked (X-Frame-Options)
-      iframe.addEventListener('load', function() {
-        try {
-          // If we can access contentDocument, it loaded
-          const doc = iframe.contentDocument || iframe.contentWindow.document;
-          if (!doc || doc.URL === 'about:blank') throw new Error('blocked');
-        } catch(e) {
-          // Cross-origin = blocked by X-Frame-Options — show fallback
-          document.getElementById('blocked-fallback').classList.add('show');
-        }
-      });
-
-      // ── Scroll Animation (9 seconds) ──
-      const SCROLL_DURATION = 9000;
-      const MAX_TRANSLATE = 1300; // px
-      let startTime = null;
-      let animFrame;
+      var SCROLL_DURATION = 9000;
+      var MAX_TRANSLATE = 1300;
+      var scrollStarted = false;
 
       function easeInOut(t) {
-        return t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+        return t < 0.5 ? 2*t*t : 1 - Math.pow(-2*t+2,2)/2;
       }
 
-      function animateScroll(timestamp) {
-        if (!startTime) startTime = timestamp;
-        const elapsed = timestamp - startTime;
-        const progress = Math.min(elapsed / SCROLL_DURATION, 1);
-        const eased = easeInOut(progress);
-        const translateY = -(eased * MAX_TRANSLATE);
-
-        iframe.style.transform = 'translateY(' + translateY + 'px)';
-
-        if (progress < 1) {
-          animFrame = requestAnimationFrame(animateScroll);
-        } else {
-          // Scroll done — hide indicator
-          document.getElementById('scroll-indicator').classList.add('hidden');
+      function startScroll(el) {
+        if (scrollStarted) return;
+        scrollStarted = true;
+        var startTime = null;
+        function animate(ts) {
+          if (!startTime) startTime = ts;
+          var progress = Math.min((ts - startTime) / SCROLL_DURATION, 1);
+          el.style.transform = 'translateY(' + (-(easeInOut(progress) * MAX_TRANSLATE)) + 'px)';
+          if (progress < 1) {
+            requestAnimationFrame(animate);
+          } else {
+            document.getElementById('scroll-indicator').classList.add('hidden');
+          }
         }
+        setTimeout(function() { requestAnimationFrame(animate); }, 800);
       }
 
-      // Start scroll after 1.2s (let page render)
-      setTimeout(function() {
-        animFrame = requestAnimationFrame(animateScroll);
-      }, 1200);
+      function hideLoading() {
+        document.getElementById('loading-bg').classList.add('hidden');
+      }
 
-      // ── Page title ──
-      document.title = co
-        ? 'Message for ' + to + ' @ ' + co
-        : 'Personal message for ' + to;
+      function showScreenshot() {
+        document.getElementById('site-container').style.display = 'none';
+        var screenshotBg = document.getElementById('screenshot-bg');
+        var screenshotImg = document.getElementById('screenshot-img');
+        screenshotBg.style.display = 'block';
+
+        // thum.io — free, no API key, works for any public URL
+        var thumbUrl = 'https://image.thum.io/get/width/1280/crop/900/noanimate/' + site;
+        screenshotImg.src = thumbUrl;
+
+        screenshotImg.onload = function() {
+          hideLoading();
+          startScroll(screenshotImg);
+        };
+
+        screenshotImg.onerror = function() {
+          // Try fallback screenshot service
+          var fallbackUrl = 'https://api.screenshotmachine.com?url=' + encodeURIComponent(site) + '&dimension=1280x900&format=jpg&delay=2000';
+          screenshotImg.onerror = function() {
+            // Give up — just show gradient background
+            screenshotBg.style.display = 'none';
+            document.body.style.background = 'linear-gradient(135deg, #0f172a 0%, #1a2744 50%, #0f172a 100%)';
+            hideLoading();
+            scrollStarted = true;
+            document.getElementById('scroll-indicator').classList.add('hidden');
+          };
+          screenshotImg.src = fallbackUrl;
+        };
+      }
+
+      // Try direct iframe
+      var iframe = document.getElementById('site-iframe');
+      iframe.src = site;
+
+      // Timeout: if iframe doesn't load in 3.5s, fall back to screenshot
+      var iframeTimeout = setTimeout(function() {
+        showScreenshot();
+      }, 3500);
+
+      iframe.addEventListener('load', function() {
+        var blocked = false;
+        try {
+          var doc = iframe.contentDocument || iframe.contentWindow.document;
+          if (!doc || !doc.body || doc.body.innerHTML.length < 50) blocked = true;
+        } catch(e) {
+          // Cross-origin error = site actually loaded in iframe, just can't read DOM
+          // This is the GOOD case — site is showing
+          blocked = false;
+        }
+
+        if (!blocked) {
+          clearTimeout(iframeTimeout);
+          hideLoading();
+          startScroll(iframe);
+        }
+        // If blocked=true, timeout will handle it
+      });
 
     })();
   </script>
